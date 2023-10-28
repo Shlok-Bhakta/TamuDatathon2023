@@ -1,0 +1,9 @@
+.MuiFormControl-root {
+    display: block;
+    width: 100% !important;
+    max-width: none !important;
+}
+
+.MuiInputBase-root {
+    width: 100%;
+}
