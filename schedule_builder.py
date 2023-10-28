@@ -5,17 +5,25 @@ import cohere
 prompt = ('1. Do CS221 HW (most important) \n2. Read POLS206 textbook \n3. Workout \n4. Read HIST105 novel \n'
           '5. Prep for datathon (least important)')
 co = cohere.Client('s0Sws2fzSjJPeXu0zXwztHc9RisE1A8TVKxBkDgY')
-response = 'test'
+response = ''
+feedback = ''
 
 
-def button_pressed(state):
-    result = co.generate(
-        prompt=f"""Generate a single-day schedule for me with the following priorities: {prompt} Only give me the list
+def generate_schedule(state):
+    state.response = co.generate(
+        prompt=f"""Generate a single-day schedule for me with the following priorities: {prompt} Only give me a list 
                with times and tasks.""",
-        max_tokens=200
+        max_tokens=125
     )[0].text
-    state.response = result
-    print(result)
+
+
+def submit_feedback(state):
+    state.response = co.generate(
+        prompt=f"""Here is the schedule you gave me: \"{prompt}\"
+                Here is my feedback: {feedback}.
+                Regenerate the schedule with this feedback in mind; only give me a list with times and tasks.""",
+        max_tokens=125
+    )[0].text
 
 
 page = """
@@ -27,7 +35,7 @@ page = """
 <|container|
 Input your daily priorities: <br/>
 <|{prompt}|input|class_name=schedule-input|multiline|> <br/>
-<|Generate|button|on_action=button_pressed|class_name=plain|>
+<|Generate|button|on_action=generate_schedule|class_name=plain|>
 |>
 |>
 
@@ -38,6 +46,13 @@ Generated Schedule: <br/>
 |>
 |>
 
+|>
+
+<br/>
+<|container|
+Feedback on this schedule:
+<|{feedback}|input|multiline|> <br />
+<|Submit|button|on_action=submit_feedback|class_name=plain|>
 |>
 """
 
