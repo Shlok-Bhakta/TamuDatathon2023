@@ -1,10 +1,9 @@
-.container-styling{
-    background-color: grey;
-    color: white;
-    border: 3px solid white;
-    text-align: center;
-    justify-content: center;
-    align-items: center;
-    margin: auto;
-    padding: 20px;
+.MuiFormControl-root {
+    display: block;
+    width: 100% !important;
+    max-width: none !important;
+}
+
+.MuiInputBase-root {
+    width: 100%;
 }
