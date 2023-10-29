@@ -1,5 +1,5 @@
 import taipy as tp
-from taipy import Gui
+from taipy.gui import Gui, notify
 import cohere
 import pandas as pd
 
@@ -8,14 +8,6 @@ prompt = ('1. Do CS221 HW (most important) \n2. Read POLS206 textbook \n3. Worko
 co = cohere.Client('s0Sws2fzSjJPeXu0zXwztHc9RisE1A8TVKxBkDgY')
 response = ''
 feedback = ''
-
-food_df = pd.DataFrame({
-    "Meal": ["Lunch", "Dinner", "Lunch", "Lunch", "Breakfast", "Breakfast", "Lunch", "Dinner"],
-    "Category": ["Food", "Food", "Drink", "Food", "Food", "Drink", "Dessert", "Dessert"],
-    "Name": ["Burger", "Pizza", "Soda", "Salad", "Pasta", "Water", "Ice Cream", "Cake"],
-    "Calories": [300, 400, 150, 200, 500, 0, 400, 500],
-})
-
 
 def generate_schedule(state):
     state.response = co.generate(
@@ -32,6 +24,25 @@ def submit_feedback(state):
                 Regenerate the schedule with this feedback in mind; only give me a list with times and tasks.""",
         max_tokens=125
     )[0].text
+
+
+def food_df_on_edit(state, var_name, payload):
+    index = payload["index"] # row index
+    col = payload["col"] # column name
+    value = payload["value"] # new value cast to the column type
+    user_value = payload["user_value"] # new value as entered by the user
+
+    old_value = state.food_df.loc[index, col]
+    new_food_df = state.food_df.copy()
+    new_food_df.loc[index, col] = value
+    state.food_df = new_food_df
+    notify(state, "I", f"Edited value from '{old_value}' to '{value}'. (index '{index}', column '{col}')")
+
+
+data = {
+  "Country": ["Rest of the world","Russian Federation",...,"Peru"],
+  "Area": [1445674.66,815312,...,72330.4]
+}
 
 
 page = """
@@ -63,7 +74,6 @@ Feedback on this schedule:
 <|Submit|button|on_action=submit_feedback|class_name=plain|>
 |>
 <br/>
-<|{food_df}|table|>
 
 """
 
