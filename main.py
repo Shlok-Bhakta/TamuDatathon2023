@@ -9,6 +9,7 @@ co = cohere.Client('s0Sws2fzSjJPeXu0zXwztHc9RisE1A8TVKxBkDgY')
 response = ''
 feedback = ''
 
+
 def generate_schedule(state):
     state.response = co.generate(
         prompt=f"""Generate a single-day schedule for me with the following priorities: {prompt} Only give me a list 
@@ -26,42 +27,24 @@ def submit_feedback(state):
     )[0].text
 
 
-def food_df_on_edit(state, var_name, payload):
-    index = payload["index"] # row index
-    col = payload["col"] # column name
-    value = payload["value"] # new value cast to the column type
-    user_value = payload["user_value"] # new value as entered by the user
-
-    old_value = state.food_df.loc[index, col]
-    new_food_df = state.food_df.copy()
-    new_food_df.loc[index, col] = value
-    state.food_df = new_food_df
-    notify(state, "I", f"Edited value from '{old_value}' to '{value}'. (index '{index}', column '{col}')")
-
-
-data = {
-  "Country": ["Rest of the world","Russian Federation",...,"Peru"],
-  "Area": [1445674.66,815312,...,72330.4]
-}
-
-
 page = """
-###Scheduler Builder
+###Schedule Builder
 
 <|layout|columns=1 1|
 
 <|first column
 <|container|
-Input your daily priorities: <br/>
-<|{prompt}|input|class_name=schedule-input|multiline|> <br/>
+Input your daily priorities:
+<|{prompt}|input|class_name=schedule-input|multiline|>
 <|Generate|button|on_action=generate_schedule|class_name=plain|>
 |>
 |>
 
 <|second column
 <|container|
-Generated Schedule: <br/>
-<|{response}|input|class_name=schedule-result|multiline|>
+Feedback on this schedule:
+<|{feedback}|input|multiline|>
+<|Submit|button|on_action=submit_feedback|class_name=plain|>
 |>
 |>
 
@@ -69,9 +52,8 @@ Generated Schedule: <br/>
 
 <br/>
 <|container|
-Feedback on this schedule:
-<|{feedback}|input|multiline|> <br />
-<|Submit|button|on_action=submit_feedback|class_name=plain|>
+Generated Schedule: <br/>
+<|{response}|input|class_name=schedule-result|multiline|>
 |>
 <br/>
 
