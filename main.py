@@ -1,8 +1,10 @@
 from taipy.gui import Gui, notify
 import openai as oa
+from dotenv import load_dotenv
+import os
 
-OPENAI_API_KEY = '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'
-oa.api_key = OPENAI_API_KEY
+load_dotenv()
+oa.api_key = os.environ.get('OPENAI_API_KEY')
 oa.Model.list()
 
 # Default state values (only refer to state.var_name when modifying them)
